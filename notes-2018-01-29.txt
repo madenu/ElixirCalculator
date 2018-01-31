@@ -1,0 +1,190 @@
+NEW PROGRAMMING LANGUAGE
+
+On server-side you can use whatever
+Program must speak HTTP
+Computers with web browsers make HTTP requests/connections to/with servers
+Server responsds with HTML and/or JavaScript
+Software to keep track of state like status of online shopping orders
+More than one server which leads to the necessity of a database
+The simplest system is already a distributed system
+(Most places only need one database server, unless lots of data)
+And yet there's more...
+Web Browsers -> Web Servers -> **APP SERVERS** -> Database Servers
+---
+App servers may or may not speak HTTP
+We use Phoenix on our web servers
+---
+Web Servers:
+
+ - Run programs that listen for and respond to HTTP requests.
+
+Server-side programming languages:
+ - High-performance dynamic: JavaScript, Lua (uniquely well-optimized)
+ - Low performance dynamic: Python, PHP, Ruby, Perl (speed of development as priority)
+ - C#, Java, Kotlin, Clojure, Scala (enteprise, long startup time, compile to bytecode, verbose)
+ - Go
+ - C, C++, Rust (performance-centric, low-level, compile fully to machine code, slow development time)
+ - (where does Scala fit in?)
+
+Languages we probably shouldn't use for this:
+ - R, Postscript, Matlab, ...
+
+Web development frameworks:
+ - Don't want to write your own web server every time
+ - Django / Python, Rails / Ruby
+
+Web framework structure:
+ - Sequential, in order: (e.g. Ruby on Rails)
+   * Does one request at a time.
+   * That's slow.
+   * Need to run a bunch of server processes in parallel.
+   * Hard to share stuff between processes (threads too?)
+ - (JavaScript is innately sequential)
+
+ - Sequential, out of order (nodejs):
+   * Interleaves requests with callbacks and non-blocking I/O. (less memory & more requests per second)
+ - Parallel with threads: JavaScript
+   * (only becomes useful after a certain point, there is a tradeoff)
+   * (shared memory concurrency and deadlock)
+   * Cand do more, but it's a horror show of deadlock and data races.
+   * Still can't share data between processes.
+
+---
+
+ (should still learn above ^)
+ Elixir compiles to bytecode for the BEAM VM
+ BEAM = Erlang VM. (Erlang developed by Erickson (sp?) in the 80's)
+ Built to run telephone switches.
+  - No downtime, actually zero.
+    * Hardware redundancy.
+    * Erlang enables this with hot code upgrades. (or hot code swapping)
+  - Low latency. 5ms is probably OK, but not more.
+  - Distributed and concurrent by default.
+
+---
+
+What Elixir is:
+ - Pretty much like ISL+ from Fundies 1 / PDP.
+   * Dynamic functional programming language.
+   * Can't mutate database
+   * Linked list as core data type
+   * No loop statements
+   * Repetition is by recursion
+   * Loop functions: map, filter, reduce
+   * Interactive REPL !!!
+   *
+ - New features:
+   * Non-LISP syntax
+   * Separate function / variable namespaces
+   * Modules !!! ()
+   * Pattern matching ???
+   * Side effects
+   * Maps (associative arrays, like "hashes")
+   * Lightweight processes & message passing
+
+---
+
+Coding in Elixir
+    Declare what Module
+    To compile
+        elixirc fib.ex -> Elixir.Fib.beam
+        iex (interactive Elixir REPL)
+    To make new elixir project
+        mix new <project-name> # different from phx.new
+        makes a .gitignore for us
+        mix test
+    Run the code
+        iex -S mix # from project directory, tell iex that we're using mix
+        elixir -e <name of something>
+---
+defmodule Fib do
+    # fib(0) = 0
+    # fib(1) = 1
+    # fib(k) = fib(k-1) + fib(k-2)
+    # pattern matching example
+    # look at the recursion and separation of base cases w/o if statements
+    def fib(0), do: 0
+    def fib(1), do: 1
+    def fib(k) do
+        fib(k-1) + fib(k-2)
+    end
+end
+---
+defmodule Fact do
+    # fact(1) = 1
+    # fact(x) = x * fact(x-1)
+    def fact(1), do: 1
+    def fact(x) do
+        x * fact(x-1)
+    end
+    # optimize with accumulator <-- is Racket's compiler smart enough to optimize this for us?
+    # fact(1, acc) = acc
+    # fact(x, acc) = fact(x-1, x * acc)
+    def fact(1, acc), do: accumulator
+    def fact(x, acc), do: fact(x-1, x * acc) # fill this in later
+    # wrapper funct for interface
+    def fact(x) do  # completely different than the other function, different from overloading
+        fact(x, 1)
+    end
+    # "arity" in documentation (is this the same as) <-- see if this is the same as in Julia
+end
+---
+test "" do
+    assert Primes.is_prime?(2)
+    assert Primes.is_prime?(3)
+    assert !Primes.is_prime?(4)
+    assert Primes.is_prime?(5)
+    assert Primes.is_prime?(7)
+---
+def stream() do
+    aa = [2,3,5,7]
+    bb = Stream.iterate(8, &(&1+1))
+        |> Stream.filter(&is_prime/1) # (need to mark it as a function and describe its arity)
+    Stream.concat(aa, bb)
+end
+
+def is_prime(x) do
+    Stream.take_while(stream(), fun (y) -> y <= :math.sqrt(x) end) # :atom like a symbol
+    |> Enum.all?(&(rem(x, &1) !=0)) end
+end
+---
+add1 = fn (x) -> x + 1 end
+add1.(5) # <-- check the syntax
+Enum.map([1,2,3], add1)
+[1,2,3] |> Enum.map(add1)
+---
+numbers
+strings
+atoms
+tuples (using braces)
+lists
+maps %{aa: 4, bb: 7} # atom keys
+alterante syntax for %{"a" => 7, }
+---
+defmodule RW do
+    def example() do
+        line = IO.gets("yea? ")
+        IO.puts("{{#{line}}}")
+    end
+end
+---
+defmodule RW do
+    def loop() do
+        line = IO.gets("yea? ")
+        IO.puts("{{#{line}}}")
+        loop()
+    end
+end
+---
+not the assignment operator
+does pattern matching
+[h|t] = xs # bar is actually the cons operator operator
+---
+Enum can handle lists and streams and anything that looks like a sequence
+get reverse to work with an accumulator !!!
+# example: "one two trhee" => "three two one"
+def reverse_words(text) do
+    Enum.reverse(String.split(String.trim(text), ))
+---
+All numbers in calculator are integers and only four function calculator 
+Pipe works with whatever sometimes looks better than
