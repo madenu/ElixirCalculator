@@ -1,10 +1,10 @@
 # cs5610hw04
 
-## TODO
+### TODO
 * <del>Create an Elixir project called "calc".</del>
-* Create a Calc module.
-  * Create Calc.eval(String.t()) :: float()
-  * Create Calc.main() :: :ok
+* <del>Create a Calc module.</del>
+  * <del>Create Calc.eval</del>
+  * <del>Create Calc.main</del>
 * Write tests for the public functions in Calc.
   * Make sure tests pass when you type "mix test".
 * Push your calculator to Github.
