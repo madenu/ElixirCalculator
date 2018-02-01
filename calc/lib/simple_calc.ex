@@ -1,3 +1,4 @@
+
 defmodule SimpleCalc do
   # get input expression as a string from :stdio and evaluates it
   def main do
@@ -11,13 +12,18 @@ defmodule SimpleCalc do
 
   # evaluate expression given as a list of strings, each of length 1
   def eval los do
-    case los do
-      [] -> {:none, 0.0, []}
-      [first | rest] -> eval(first, rest)
-      _ -> raise "Whatta Terrible Failure?!"
+    if los != [] do
+      [first | rest] = los
+      case first do
+        "-" -> eval(:subtract, 0, rest)
+        _ -> eval(first, rest)
+      end
+    else
+      {:none, 0.0, []}
     end
   end
 
+  # evaluate the expression after an open paren
   def eval :opened, rest do
     try do
       {:closed, operand, rest} = eval(rest)
@@ -27,8 +33,85 @@ defmodule SimpleCalc do
     end
   end
 
+  # check for more input
+  # prev is the calculated value from the earlier part of this expression
+  def eval :constant, prev, los do
+    case los do
+      [] -> {:none, prev, []}
+      [first | rest] -> eval(prev, first, rest)
+      _ -> raise "Invalid Input"
+    end
+  end
+
+  # add the next part of the expression prev
+  def eval :add, prev, los do
+    if los == [] do
+      raise "Invalid Input"
+    end
+    [first | rest] = los
+    {prev, parsed} = {prev, Integer.parse(first)}
+    case parsed do
+      :error ->
+        {state, operand, rest} = eval([first | rest])
+        {state, prev + operand, rest}
+      {val, rem} ->
+        eval(:constant, prev + val, rest)
+      _ -> raise "Invalid Input"
+    end
+  end
+
+  # subtract the next part of the expression from prev
+  def eval :subtract, prev, los do
+    if los == [] do
+      raise "Invalid Input"
+    end
+    [first | rest] = los
+    {prev, parsed} = {prev, Integer.parse(first)}
+    case parsed do
+      :error ->
+        {state, operand, rest} = eval([first | rest])
+        {state, prev - operand, rest}
+      {val, rem} ->
+        eval(:constant, prev - val, rest)
+      _ -> raise "Invalid Input"
+    end
+  end
+
+  # multiply prev by the next part of the expression
+  def eval :multiply, prev, los do
+    if los == [] do
+      raise "Invalid Input"
+    end
+    [first | rest] = los
+    {prev, parsed} = {prev, Integer.parse(first)}
+    case parsed do
+      :error ->
+        {state, operand, rest} = eval([first | rest])
+        {state, prev * operand, rest}
+      {val, rem} ->
+        eval(:constant, prev * val, rest)
+      _ -> raise "Invalid Input"
+    end
+  end
+
+  # divide prev by the next part of the expression
+  def eval :divide, prev, los do
+    if los == [] do
+      raise "Invalid Input"
+    end
+    [first | rest] = los
+    {prev, parsed} = {prev, Integer.parse(first)}
+    case parsed do
+      :error ->
+        {state, operand, rest} = eval([first | rest])
+        {state, div(prev, operand), rest}
+      {val, rem} ->
+        eval(:constant, div(prev, val), rest)
+      _ -> raise "Invalid Input"
+    end
+  end
+
   # evalaute expression given the first part and the rest
-  # String List<String> -> float
   def eval first, rest do
     {temp, parsed} = {first, Integer.parse(first)}
     case {temp, parsed} do
@@ -38,32 +121,15 @@ defmodule SimpleCalc do
     end
   end
 
-  # prev is the integer just before this part of the expression
-  # check for more input
-  def eval :constant, prev, los do
-    case los do
-      [] -> {:none, prev, []}
-      [first | rest] -> eval(prev, first, rest)
-    end
-  end
-
-  # prev is the integer just before this part of the expression
   # evaluate the rest of the expression
+  # prev is the integer just before this part of the expression
   def eval prev, first, rest do
     case first do
       ")" -> {:closed, prev, rest}
-      "+" ->
-        {state, operand, rest} = eval(rest)
-        {state, prev + operand, rest}
-      "-" ->
-        {state, operand, rest} = eval(rest)
-        {state, prev - operand, rest}
-      "*" ->
-        {state, operand, rest} = eval(:multiply, rest)
-        {state, prev * operand, rest}
-      "/" ->
-        {state, operand, rest} = eval(:divide, rest)
-        {state, prev / operand, rest}
+      "+" -> eval(:add, prev, rest)
+      "-" -> eval(:subtract, prev, rest)
+      "*" -> eval(:multiply, prev, rest)
+      "/" -> eval(:divide, prev, rest)
       _ -> raise "Invalid Input"
     end
   end
