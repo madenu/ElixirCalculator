@@ -6,6 +6,13 @@ defmodule SimpleCalcTest do
     str |> String.split("") |> Enum.filter(fn x -> (x != "") && (x != " ") end)
   end
 
+  test "examples from assignment" do
+    assert SimpleCalc.eval(["2", "+", "3"]) == {:none, 5, []}
+    assert SimpleCalc.eval(["5", "*", "1"]) == {:none, 5, []}
+    assert SimpleCalc.eval(["20", "/", "4"]) == {:none, 5, []}
+    assert SimpleCalc.eval(["24", "/", "6", "+", "(", "5", "-", "4", ")"]) == {:none, 5, []}
+  end
+
   test "add/subtract no parens" do
     assert SimpleCalc.eval([]) == {:none, 0, []}
     assert SimpleCalc.eval(["1"]) == {:none, 1, []}
@@ -15,21 +22,13 @@ defmodule SimpleCalcTest do
     assert SimpleCalc.eval(split_filter("2 + 3 - 1 + 2 - 1 + 2")) == {:none, 7, []}
   end
 
-  test "add/subtract with parens" do
+  test "harder" do
+    input_ls = ["(", "(", "(", "(", "8", ")", ")", ")", ")", "-", "(", "92", "/", "3", ")",
+ "+", "4", "-", "(", "1", "/", "3", ")", "*", "2", "+", "1", "+"]
+    input = "((((8)))) - (92 / 3) + 4 - (1/3) * 2 + 1 + 1"
+    |> String.split("")
+    |> Enum.filter(fn x -> (x != " ") && (x != "") && (x != "\n") end)
+    assert SimpleCalc.reformat(input) == input_ls
+    asssert SimpleCalc.eval(input_ls) == {:none, -24, []}
   end
-
-  test "multiply/divide no parens" do
-  end
-
-  test "multiply/divide with parens" do
-  end
-
-  test "four functions no parens" do
-  end
-
-  test "four functions with parens" do
-  end
-
-  # TODO test helper methods individually
-
 end
