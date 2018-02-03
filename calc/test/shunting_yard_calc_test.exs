@@ -16,6 +16,26 @@ defmodule ShuntingYardCalcTest do
 
     assert SYC.eval(["24", "/", "6", "+", "(", "5", "-", "4", ")"], [], []) ==
              ["+", "-", "4", "5", "/", "6", "24"]
+
+    assert SYC.eval(["1", "+", "3", "*", "3", "+", "1"], [], []) ==
+             ["+", "+", "1", "*", "3", "3", "1"]
+  end
+
+  test "eval_rpn" do
+    assert ["+", "3", "2"] |> Enum.reverse() |> SYC.eval_rpn([]) == "5"
+    assert ["*", "1", "5"] |> Enum.reverse() |> SYC.eval_rpn([]) == "5"
+    assert ["/", "4", "20"] |> Enum.reverse() |> SYC.eval_rpn([]) == "5"
+
+    assert ["+", "-", "4", "5", "/", "6", "24"]
+           |> Enum.reverse()
+           |> SYC.eval_rpn([]) == "5"
+
+    assert ["+", "+", "1", "*", "3", "3", "1"]
+           |> Enum.reverse()
+           |> SYC.eval_rpn([]) == "11"
+  end
+
+  test "eval_calc" do
   end
 
   def split_filter(str) do

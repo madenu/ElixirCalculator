@@ -5,15 +5,18 @@ precedence = %{"+" => 0, "-" => 0, "*" => 1, "/" => 1}
 
 defmodule ShuntingYardCalc do
   # get input expression as a string from :stdio and evaluates it
-  # def main do
-  #   result_tuple =
-  #     IO.gets("> ")
-  #     |> String.split("")
-  #     |> Enum.filter(fn x -> x != " " && x != "" && x != "\n" end)
-  #     |> reformat("", [])
-  #
-  #   main()
-  # end
+  def main do
+    result_tuple =
+      IO.gets("> ")
+      |> String.split("")
+      |> Enum.filter(fn x -> x != " " && x != "" && x != "\n" end)
+      |> reformat("", [])
+      |> eval([], [])
+      |> eval_result()
+      |> IO.puts()
+
+    main()
+  end
 
   # reformats the given list of strings to expression tokens
   def reformat(los, temp, final) do
@@ -85,6 +88,10 @@ defmodule ShuntingYardCalc do
       compare_to(op, top) < 0 ->
         [top | opstack] = opstack
         eval_op([op | rest], [top | outq], opstack)
+
+      # push higher precedence operator to opstack
+      true ->
+        eval(rest, outq, [op | opstack])
     end
   end
 
@@ -96,6 +103,45 @@ defmodule ShuntingYardCalc do
       eval_paren(rest, [token | outq], opstack)
     else
       eval(rest, outq, opstack)
+    end
+  end
+
+  # evaluates the result of eval
+  defp eval_result(expr) do
+    expr = Enum.reverse(expr)
+    eval_rpn(expr, [])
+  end
+
+  # evaluates an expression given as a list of tokens in RPN
+  def eval_rpn(expr, stack) do
+    if expr == [] do
+      case stack do
+        [res | _] -> res
+        [] -> "0"
+      end
+    else
+      [token | expr] = expr
+
+      if op?(token) do
+        [op2 | [op1 | stack]] = stack
+        stack = [eval_calc(token, op1, op2) | stack]
+        eval_rpn(expr, stack)
+      else
+        eval_rpn(expr, [token | stack])
+      end
+    end
+  end
+
+  # does arithmetic
+  def eval_calc(token, op1, op2) do
+    {int1, _} = Integer.parse(op1)
+    {int2, _} = Integer.parse(op2)
+
+    case token do
+      "+" -> (int1 + int2) |> Kernel.inspect()
+      "-" -> (int1 - int2) |> Kernel.inspect()
+      "*" -> (int1 * int2) |> Kernel.inspect()
+      "/" -> div(int1, int2) |> Kernel.inspect()
     end
   end
 
