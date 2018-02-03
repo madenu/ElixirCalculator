@@ -1,0 +1,60 @@
+# Using Elixir for Server-Side Web Dev
+
+## Debugging
+* iex -S mix
+* :debugger.start()
+* :int.ni(YourModule)
+
+## In-Class Examples
+* did tick.ex example
+* did pmap.ex example
+
+## A new Phoenix app
+
+* complain about ipv6 to the school
+* in the lib/ is where the Elixir source code is
+    - demo vs demo_web is that the demo_web is for swapping U/I
+    - find application.ex
+    - application still started up with "iex -S mix"
+
+* A web server can be thought of as a pure function (mostly):
+    - HTTP Req => HTTP Resp
+    - check out the router.ex file
+    - Plugs
+        * Gives you an interface for function that map
+        * Stores the HTTP request and the partially constructed response in a structure called a "Conn"
+        * map Conn => Conn
+    - PageController in the controllers directory
+
+* For each HTTP request:
+    - Router
+    - Initial Plugs
+    - Controller function
+    - View (convention PageController paired with page_view.)
+    - Template
+
+* Prof Tuck added form to the index.html.eex
+    - We didn't have a route for the POST / form
+    - So we had to add a route
+    - Made a corresponding function in the page condtroller
+    - Check out what _params is wiht an IO.inspect
+    - (Will talk about CSRF later)
+    - We need a :protect_from_forgery plug (but we can disable)
+    - Pay attention to what's displayed on stdout when making HTTP requests
+    ```<form action="/form" method="post">
+            <p><input id=name> </input></p>
+            <p><button>Submit</button></p>```
+
+* Make another page to display form
+    - Print out response to form on a different page
+    - check out the <% @name %> variable interpolation stuff
+    - generates
+    - can somehow do keyword list as parameter with Elixir functions'
+    - can check out cookies, click on the HTTP requests to see the headers set-cookie
+
+* Production secret file
+    - Need to check this out so as not to spoof cookies
+    - Do not put the session keys in your git repo
+    - uid to be admin
+
+* Next session we'll be talking about Elixir

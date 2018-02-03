@@ -1,0 +1,27 @@
+
+Web Dev Spring 2018 HW04 Status
+
+Answer the following questions:
+
+1. What's your name?
+    Matthias Denu
+
+
+2. What's the URL of the github repo with your calc program?
+    https://github.com/matthiasdenu/cs5610hw04
+
+
+3. Is your calc program's functionality complete? If not, what's missing?
+    Yes
+
+
+4. Did you complete the CodeSchool tutorial?
+    Yes. I really enjoyed the suggested resources. They were helpful.
+
+
+5. Are you familiar enough with the Elixir documentation to find stuff when you need it?
+    Kind of -- There is a lot to learn.
+
+
+And here's a list of tasks for grading comments. Just leave this here:
+ - Submission
