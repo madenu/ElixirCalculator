@@ -12,3 +12,9 @@
 
 ### Misc.
 Play with Code.eval_string/3 later
+
+#### Debugging
+* iex -S mix
+* :debugger.start()
+* :int.ni(YourModule)
+* int.break(YourModule, <line-number>)
